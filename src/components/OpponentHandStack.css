@@ -1,0 +1,70 @@
+/* client/src/components/OpponentHandStack.css */
+
+.opp-card-stack-container {
+    position: absolute;
+    width: 60px; /* Tăng kích thước xấp bài một chút */
+    height: auto;
+    z-index: 5;
+    pointer-events: none; /* Không cản trở click */
+}
+
+/* Định vị 3 góc của bàn */
+.left-side { left: 80px; top: 30%; transform: translateY(-50%); }
+.top { top: 20px; left: 50%; transform: translateX(-50%); }
+.right-side { right: 80px; top: 30%; transform: translateY(-50%); }
+
+.opp-card-stack-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 1. ĐỊNH DẠNG CHUNG CHO LÁ BÀI GIẢ */
+.opp-fake-card {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+    
+    /* 2. CHỌN HIỆU ỨNG 3D: Dịch chuyển X và Y dựa trên variable --card-depth */
+    /* Mẹo: dịch chuyển X dương, Y âm để tạo khối 3D bay lên */
+    transform: translate(calc(var(--card-depth) * 1px), calc(var(--card-depth) * -1.5px));
+}
+
+.opp-fake-card img {
+    width: 100%;
+    border-radius: 4px; /* Bo góc nhẹ */
+    
+    /* --- SỬA Ở ĐÂY: XÓA ĐÒNG NÀY ĐỂ LOẠI BỎ BÓNG LỖI --- */
+    /* box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.5); */
+    
+    /* Sử dụng bóng cực kỳ mờ và sắc nét chỉ để tạo khối nhẹ cho ảnh */
+    box-shadow: 0px 0px 1px rgba(0,0,0,0.1); 
+    
+    /* Đảm bảo ảnh không bị kéo dãn */
+    object-fit: contain; 
+}
+
+/* 3. ĐỊNH DẠNG HUY HIỆU ĐỎ CHỨA SỐ (Badge) */
+.opp-card-count-badge {
+    position: absolute;
+    
+    /* Đặt huy hiệu nằm trên cùng của xấp bài được dịch chuyển */
+    /* Lấy offset Y lớn nhất (var(--fake-card-count) * -1.5px) */
+    top: calc(-10px + var(--card-depth) * -1.5px); 
+    left: 50%;
+    transform: translateX(-50%) scale(1.1); /* To hơn một chút */
+    
+    background: linear-gradient(to bottom, #ff3333 0%, #cc0000 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 10; /* Nằm trên cùng */
+}

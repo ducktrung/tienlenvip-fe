@@ -1,0 +1,1471 @@
+/* RESET VÀ KHÓA MÀN HÌNH CHỐNG SCROLL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Cực kỳ quan trọng để làm mất thanh scroll bên phải */
+  background-color: #000;
+}
+
+/* 1. NỀN PHÒNG TỐI */
+.casino-room {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #2b2b2b 0%, #111111 60%, #000000 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 2. CÁI BÀN ĐỎ */
+.game-table {
+  width: 960px;
+  height: 540px;
+  background: radial-gradient(circle at center, #c11f1f 0%, #8B0000 70%, #5a0000 100%);
+  border-radius: 260px; 
+  position: relative;
+  border: 12px solid #3e2723; 
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    inset 0 0 50px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 4px rgba(255, 215, 0, 0.3);
+}
+
+.table-center-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 50px;
+  font-weight: bold;
+  letter-spacing: 10px;
+}
+
+/* 3. THÔNG TIN CỦA BẠN (GÓC TRÁI DƯỚI) */
+.player-info {
+  position: absolute;
+  text-align: center;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+  font-weight: bold;
+}
+.bottom-left {
+  bottom: 20px;
+  left: 30px;
+}
+.avatar-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #333;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  margin: 0 auto 5px auto;
+}
+.player-name { font-size: 15px; color: #fff; }
+.player-money { font-size: 13px; color: #ffd700; }
+
+/* 4. NÚT BẤM (GÓC PHẢI DƯỚI) */
+.action-buttons {
+  position: absolute;
+  bottom: 120px; 
+  right: 60px;
+  display: flex;
+  gap: 15px;
+  z-index: 10; 
+}
+.btn {
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+  border: none;
+  border-radius: 30px; 
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.4); 
+  transition: all 0.1s ease-in-out;
+}
+.btn-green {
+  background: linear-gradient(to bottom, #32cd32 0%, #008000 100%);
+  box-shadow: 0 6px 0 #005000, 0 10px 10px rgba(0,0,0,0.4); 
+}
+.btn-orange {
+  background: linear-gradient(to bottom, #ff8c00 0%, #d24d00 100%);
+  box-shadow: 0 6px 0 #a03000, 0 10px 10px rgba(0,0,0,0.4); 
+}
+.btn:active {
+  transform: translateY(6px); 
+  box-shadow: 0 0px 0 transparent, 0 4px 4px rgba(0,0,0,0.4); 
+}
+/* =========================================
+   KHU VỰC SÀN ĐẤU (GIỮA BÀN)
+   ========================================= */
+/* App.css */
+
+.center-board {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%; /* Tăng không gian lên để chứa 3 đôi thông/tứ quý */
+    height: 60%;
+    
+    /* 🛑 CỰC KỲ QUAN TRỌNG: KHÔNG BAO GIỜ DÙNG OVERFLOW HIDDEN Ở ĐÂY */
+    overflow: visible !important; 
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.play-batch {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 🛑 BẢO ĐẢM KHÔNG BỊ CẮT XÉN */
+    overflow: visible !important; 
+}
+/* BÀI CŨ: Bị làm tối, thu nhỏ nhẹ và đẩy ra phía sau */
+.play-batch.old {
+    filter: brightness(0.6) grayscale(0.2); /* Tối và hơi nhạt màu */
+    z-index: 1; /* Nằm dưới */
+}
+
+/* BÀI MỚI NHẤT: Bật sáng, giữ nguyên kích thước, nổi lên trên */
+.play-batch.latest {
+    filter: brightness(1.1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.2)); /* Hào quang trắng sáng */
+    z-index: 10; /* Nằm trên cùng */
+}
+.center-board .flying-card {
+    position: relative; /* Đảm bảo Flexbox quản lý được */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    
+    /* Hiệu ứng xuất phát từ dưới */
+    transform: translateY(400px) scale(0.5);
+    opacity: 0;
+    
+    /* Giữ nguyên độ đè bài của bạn */
+    margin-left: -75px; 
+}
+.play-batch .flying-card {
+    position: relative;
+    /* Thu hẹp khoảng cách giữa các lá bài đang đánh ra trên bàn một chút */
+    /* Để 6 lá của 3 đôi thông không bị dài ngoằng lấn sang màn hình đối thủ */
+    margin-left: -40px; 
+}
+
+/* Khi hạ cánh */
+.center-board .flying-card.played {
+    transform: translateY(0) scale(0.85);
+    opacity: 1;
+}
+/* =========================================
+   VÒNG SÁNG LƯỢT CHƠI & ĐỒNG HỒ
+   ========================================= */
+.active-turn {
+    border-color: #00ff00 !important; /* Đổi viền thành màu xanh lá Neon */
+    animation: pulse-glow 0.8s infinite alternate; /* Hiệu ứng chớp tắt nhịp thở */
+    position: relative;
+}
+
+@keyframes pulse-glow {
+    from { box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.4); }
+    to { box-shadow: 0 0 25px 8px rgba(0, 255, 0, 0.9); }
+}
+
+.turn-timer-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #ff0000;
+    color: white;
+    font-weight: 900;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    z-index: 20;
+}
+
+/* =========================================
+   HIỆU ỨNG CHIA BÀI (DEALING ANIMATION)
+   ========================================= */
+.dealing-animation-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 45px;
+    height: 65px;
+    z-index: 20;
+}
+
+/* Xấp bài úp nằm im ở giữa để giả làm nọc */
+.deck-center {
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/cards/Cards (large)/card_back.png');
+    /* 2. SỬA LỖI MẤT BÀI: Đổi 'cover' thành 'contain' để ảnh giữ nguyên tỷ lệ gốc, không bị xén */
+    background-size: contain; 
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* 3. SỬA LỖI BÓNG ĐEN: Tắt cái bóng vuông vô duyên đi */
+    box-shadow: none !important; 
+    
+    /* Thay bằng hiệu ứng drop-shadow: Cái bóng sẽ tự động "ôm sát" vào mép lá bài cực xịn */
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6));
+}
+
+/* Các lá bài bay vèo vèo ra 4 hướng */
+.flying-deal-card {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('/assets/cards/Cards (large)/card_back.png');
+    
+    /* Đổi 'cover' thành 'contain' cho đồng bộ */
+    background-size: contain; 
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+}
+
+/* Áp dụng ảo ảnh bay liên tục (infinite) trong lúc chia bài */
+.to-bottom { animation: flyBottom 0.15s infinite; }
+.to-left { animation: flyLeft 0.15s infinite 0.04s; }
+.to-top { animation: flyTop 0.15s infinite 0.08s; }
+.to-right { animation: flyRight 0.15s infinite 0.12s; }
+
+@keyframes flyBottom { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(0, 250px) scale(0.5) rotate(180deg); opacity: 0; } }
+@keyframes flyLeft { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(-350px, 0) scale(0.5) rotate(-180deg); opacity: 0; } }
+@keyframes flyTop { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(0, -200px) scale(0.5) rotate(180deg); opacity: 0; } }
+@keyframes flyRight { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(350px, 0) scale(0.5) rotate(180deg); opacity: 0; } }
+/* =========================================
+   HIỆU ỨNG BÀI BAY TỪ TỪNG ĐỐI THỦ (FLY FROM ORIGIN)
+   ========================================= */
+
+/* Trạng thái chung: Thêm gia tốc để bài bay mượt như vuốt */
+.flying-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0; /* Tàng hình trước khi bắt đầu bay */
+}
+
+/* TỌA ĐỘ XUẤT PHÁT: Khi chưa có class .played, bài nằm ẩn ở chỗ của từng người chơi */
+.flying-card.from-bottom:not(.played) { transform: translateY(300px) scale(0.2); }
+.flying-card.from-left:not(.played)   { transform: translate(-400px, -50px) scale(0.2); }
+.flying-card.from-top:not(.played)    { transform: translateY(-300px) scale(0.2); }
+.flying-card.from-right:not(.played)  { transform: translate(400px, -50px) scale(0.2); }
+
+/* ĐÍCH ĐẾN: Khi class .played được bật lên (sau 50ms), bài sẽ bay vèo ra giữa bàn */
+.flying-card.played {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+}
+/* =========================================
+   HIỆU ỨNG VŨ KHÍ BAY (FLYING TROLL)
+   ========================================= */
+.flying-troll {
+    position: absolute;
+    font-size: 45px;
+    z-index: 9999;
+    /* Hiệu ứng bay cong mềm mại (ném vòng cung) */
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+    transform: translate(-50%, -50%);
+    pointer-events: none; 
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+}
+
+/* Ném bom hoặc cà chua thì xoay tít thò lò cho chân thực */
+.flying-tomato, .flying-bomb {
+    animation: spinFly 0.6s linear forwards;
+}
+
+@keyframes spinFly {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.5); }
+    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.5); } /* Bay lên cao to ra */
+    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+/* =========================================
+   HIỆU ỨNG BAY CỦA VŨ KHÍ HẠNG NẶNG
+   ========================================= */
+
+/* Tên lửa bay thẳng, to dần lên và rung lắc nhẹ tạo cảm giác phá hoại */
+.flying-nuclear {
+    animation: rocketLaunch 0.6s ease-in forwards;
+}
+
+@keyframes rocketLaunch {
+    0% { transform: translate(-50%, -50%) scale(0.5) rotate(45deg); }
+    50% { transform: translate(-50%, -50%) scale(1.5) rotate(45deg) skewX(10deg); filter: drop-shadow(0 0 10px orange); }
+    100% { transform: translate(-50%, -50%) scale(2.5) rotate(45deg); filter: brightness(1.5); }
+}
+
+/* Hiệu ứng bay của Slap (bay vèo tới đập vào mặt) */
+.flying-slap, .flying-slap2 {
+    animation: slapFly 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slapFly {
+    0% { transform: translate(-50%, -50%) scale(0.2); }
+    100% { transform: translate(-50%, -50%) scale(1.5); }
+}
+/* HIỆU ỨNG TỚI TRẮNG CỰC GẮT */
+.toi-trang-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); z-index: 5000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.toi-trang-text {
+    font-size: 80px; font-weight: 900;
+    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+    -webkit-background-clip: text; color: transparent;
+    animation: rainbowGlow 1.5s linear infinite; text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+.toi-trang-winner { font-size: 40px; color: white; margin-top: 20px; }
+@keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); transform: scale(1); } 50% { transform: scale(1.1); } 100% { filter: hue-rotate(360deg); transform: scale(1); } }
+/* =========================================
+   MÀN HÌNH TỔNG KẾT VÁN (END GAME)
+   ========================================= */
+.end-game-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 5000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.end-game-panel {
+    background: linear-gradient(145deg, #2b0f0f, #1a0505);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    width: 450px;
+    padding: 20px 30px 40px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255, 215, 0, 0.2);
+    text-align: center;
+    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.end-title {
+    color: #ffd700; font-size: 32px; font-weight: 900;
+    text-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+    margin-bottom: 25px; border-bottom: 2px dashed rgba(255,215,0,0.3); padding-bottom: 10px;
+}
+
+.results-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+
+.result-row {
+    display: flex; align-items: center; padding: 12px 15px;
+    border-radius: 12px; background: rgba(255,255,255,0.05);
+    transition: transform 0.2s;
+}
+.result-row:hover { transform: scale(1.02); background: rgba(255,255,255,0.1); }
+
+.result-row.winner {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent);
+    border-left: 5px solid #ffd700;
+}
+.result-row.loser { border-left: 5px solid #ff4444; }
+
+.res-rank {
+    font-size: 24px; font-weight: bold; width: 40px; color: #fff; opacity: 0.8;
+}
+.result-row.winner .res-rank { color: #ffd700; font-size: 30px; }
+
+.res-info { flex: 1; text-align: left; padding-left: 15px; }
+.res-name { font-size: 20px; font-weight: bold; color: white; }
+.res-note { font-size: 14px; color: #aaa; margin-top: 4px; }
+.result-row.loser .res-note { color: #ff8888; } /* Thối heo in chữ đỏ */
+
+.res-money { font-size: 22px; font-weight: 900; }
+.result-row.winner .res-money { color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+.result-row.loser .res-money { color: #ff4444; }
+
+.btn-play-again { width: 100%; font-size: 22px; letter-spacing: 2px; box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4); }
+
+@keyframes popUp { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+/* =========================================
+   HIỆU ỨNG TIỀN BAY KHI KẾT THÚC VÁN
+   ========================================= */
+.floating-money {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 26px;
+    font-weight: 900;
+    white-space: nowrap;
+    z-index: 2000;
+    /* Hiệu ứng bay lên trong 3 giây */
+    animation: floatMoneyAnim 3s ease-out forwards;
+    text-shadow: 0 3px 5px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+
+.floating-money.win { color: #00ff00; } /* Thắng màu xanh lá */
+.floating-money.lose { color: #ff3333; } /* Thua màu đỏ */
+
+@keyframes floatMoneyAnim {
+    0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+    15% { opacity: 1; transform: translate(-50%, -20px) scale(1.3); } /* Phình to ra gây chú ý */
+    30% { opacity: 1; transform: translate(-50%, -30px) scale(1); }
+    80% { opacity: 1; transform: translate(-50%, -50px) scale(1); } /* Bay từ từ lên cao */
+    100% { opacity: 0; transform: translate(-50%, -60px) scale(1); } /* Mờ dần */
+}
+/* =========================================
+   HIỆU ỨNG THẮNG / THUA / LẬT BÀI / THỐI HEO
+   ========================================= */
+
+/* 1. Hào quang Người Thắng */
+.opp-avatar.winner, .avatar-circle.winner {
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 25px #ffd700, inset 0 0 15px #ffd700;
+    animation: winnerPulse 1s infinite alternate;
+    z-index: 10;
+}
+@keyframes winnerPulse {
+    0% { filter: brightness(1) drop-shadow(0 0 10px #ffd700); }
+    100% { filter: brightness(1.3) drop-shadow(0 0 30px #ffea00); transform: scale(1.05); }
+}
+
+/* 2. Mặt xám xịt của Kẻ Thua */
+.opp-avatar.loser, .avatar-circle.loser {
+    filter: grayscale(80%) brightness(0.7);
+    border-color: #555 !important;
+    box-shadow: none !important;
+    transform: scale(0.95);
+}
+
+/* 3. Huy hiệu (Badge) */
+.winner-badge {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(180deg, #ffea00, #ff8800);
+    color: #fff; font-size: 14px; font-weight: 900; letter-spacing: 1px;
+    padding: 3px 12px; border-radius: 12px; border: 2px solid white;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5); z-index: 20;
+    text-shadow: 1px 1px 2px #d35400;
+}
+.loser-badge {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    background: #333; color: #ff4444; font-size: 12px; font-weight: 900;
+    padding: 2px 8px; border-radius: 10px; border: 1px solid #777;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 20;
+}
+
+@keyframes thoiHeoFlash {
+    0% { filter: brightness(1) drop-shadow(0 0 5px red); }
+    100% { filter: brightness(1.2) drop-shadow(0 0 20px red); }
+}
+/* =========================================
+   HIỆU ỨNG THỐI HEO KẾT THÚC VÁN ĐẤU
+   ========================================= */
+
+/* Hiệu ứng cơ bản: Border đỏ và Trôi lên top */
+.thoi-heo-highlight {
+    border: 2px solid red !important; /* High line đỏ */
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); /* Thêm phát sáng đỏ */
+    transform: translateY(-25px); /* Trôi lên top */
+    transition: transform 0.4s ease-out, border 0.4s ease-out, box-shadow 0.4s ease-out;
+    z-index: 50; /* Đảm bảo nổi lên trên các lá khác */
+}
+
+/* Thêm animation rung lắc nhẹ để tạo cảm giác "thúi" rõ hơn */
+.shake-thoi {
+    animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translateY(-25px) translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translateY(-25px) translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translateY(-25px) translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translateY(-25px) translate3d(4px, 0, 0);
+  }
+}
+/* 1. Xòe bài ra cho dễ nhìn khi lật ngửa */
+.opp-cards-fan.revealed .opp-card-back-wrapper {
+    margin-left: -20px !important; 
+    transform: scale(1.1); 
+    transition: all 0.4s ease-out;
+}
+.opp-cards-fan.revealed .opp-card-back-wrapper:first-child { margin-left: 0 !important; }
+
+/* 2. Lá Heo trôi lên và tỏa quầng sáng đỏ (KHÔNG border, KHÔNG text) */
+/* =========================================
+   HIỆU ỨNG THỐI HEO (HÀO QUANG ĐỎ ÔM SÁT BÀI)
+   ========================================= */
+
+.thoi-heo-glow {
+    /* CHỈ dùng để đẩy lá bài trôi lên top và to ra */
+    transform: translateY(-30px) scale(1.15) !important; 
+    z-index: 100 !important; 
+    
+    /* BẮT BUỘC XÓA: Không dùng box-shadow, background hay border ở đây để tránh bị lộ cái khung chữ nhật trong suốt */
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.thoi-heo-glow {
+    /* Nhô lá heo lên cao hơn các lá bài khác để bêu rếu */
+    transform: translateY(-20px) !important; 
+    z-index: 100 !important;
+    
+    /* Viền đỏ chót nhấp nháy */
+    filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.9));
+    animation: thoiHeoPulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes thoiHeoPulse {
+    0% { 
+        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.7)); 
+    }
+    100% { 
+        filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)) drop-shadow(0 0 15px rgba(255, 0, 0, 0.8)); 
+    }
+}
+
+/* Hoạt ảnh làm quầng sáng nhịp nhàng như lò phản ứng */
+@keyframes glowPulse {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.8)) 
+                drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
+    }
+    100% {
+        filter: drop-shadow(0 0 10px rgba(255, 0, 0, 1)) 
+                drop-shadow(0 0 25px rgba(255, 0, 0, 0.8)) 
+                drop-shadow(0 0 50px rgba(255, 0, 0, 0.6));
+    }
+}
+/* =========================================
+   HIỆU ỨNG CHẶT HEO (SẤM SÉT VÀ RUNG MÀN HÌNH)
+   ========================================= */
+
+.chop-overlay-effect {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Tia chớp lóe sáng mù mắt */
+.chop-flash {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: white;
+    animation: flashLightning 2.5s ease-out forwards;
+}
+
+/* Chữ CHẶT to đùng, rực lửa */
+.chop-text {
+    font-size: 150px;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 4px #fff;
+    background: url('https://media.giphy.com/media/26n6xkEEeqiooG2Mw/giphy.gif') center/cover;
+    -webkit-background-clip: text;
+    transform: scale(3) rotate(-15deg);
+    text-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 10px 10px 0 #ff0000;
+    animation: slamText 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    z-index: 2;
+    margin: 0;
+}
+
+.chop-money-transfer {
+    margin-top: 20px;
+    font-size: 30px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 5px 10px black;
+    z-index: 2;
+    text-align: center;
+    background: rgba(0,0,0,0.6);
+    padding: 15px 30px;
+    border-radius: 20px;
+    border: 2px solid #ffd700;
+    opacity: 0;
+    animation: fadeInUp 0.5s 0.3s forwards;
+}
+
+.stolen-money {
+    color: #00ff00;
+    font-size: 50px;
+    text-shadow: 0 0 20px #00ff00;
+}
+
+/* KEYFRAMES */
+@keyframes flashLightning {
+    0% { background: rgba(255, 255, 255, 1); }
+    5% { background: rgba(20, 0, 0, 0.8); } /* Tối sầm lại sau tia chớp đầu */
+    10% { background: rgba(255, 255, 255, 0.8); }
+    15% { background: rgba(20, 0, 0, 0.8); }
+    100% { background: rgba(0, 0, 0, 0); }
+}
+
+@keyframes slamText {
+    0% { transform: scale(3) rotate(-15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(-5deg); opacity: 1; }
+}
+
+@keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-10px, 10px); }
+    20%, 40%, 60%, 80% { transform: translate(10px, -10px); }
+}
+
+@keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(-20px); }
+}
+
+/* Nút Xếp Bài màu xanh */
+.btn-blue { background: linear-gradient(180deg, #3498db, #2980b9); border-color: #1f618d; }
+.btn-blue:hover { filter: brightness(1.2); }
+/* =========================================
+   HỆ THỐNG EMOJI KHỊA NHAU
+   ========================================= */
+
+/* Hiệu ứng Emoji bay nảy lên khỏi đầu Avatar */
+.floating-emoji {
+    position: absolute;
+    font-size: 60px;
+    z-index: 9999;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+    animation: emojiBounceFade 2.5s forwards ease-out;
+    transform-origin: center bottom;
+}
+
+@keyframes emojiBounceFade {
+    0% { transform: translate(-50%, 20px) scale(0); opacity: 0; }
+    15% { transform: translate(-50%, -30px) scale(1.3); opacity: 1; }
+    25% { transform: translate(-50%, -20px) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -40px) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -80px) scale(0); opacity: 0; }
+}
+
+/* Bảng điều khiển Emoji của Player */
+.player-emoji-panel {
+    position: absolute;
+    bottom: 30px;
+    left: 13%; /* Nằm ngay cạnh phải Avatar của bạn */
+    z-index: 150;
+}
+
+.btn-emoji-toggle {
+    font-size: 30px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-emoji-toggle:hover { 
+    transform: scale(1.2); 
+    background: rgba(0,0,0,0.8);
+}
+
+.emoji-picker-menu {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 15px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 140px; /* Bảng 3x2 */
+    gap: 10px;
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    animation: popInEmoji 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.emoji-item {
+    font-size: 30px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+}
+.emoji-item:hover { transform: scale(1.4); }
+
+@keyframes popInEmoji {
+    from { transform: scale(0) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+/* =========================================
+   📱 RESPONSIVE: ĐIỆN THOẠI MÀN HÌNH NGANG (Căn giữa hoàn hảo)
+   ========================================= */
+
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    
+    /* 1. LÂN LÊ (TOP): Giữ lại translateX(-50%) để canh giữa chuẩn xác */
+    .opponent-wrapper.top {
+        top: 60px !important; /* Kéo nhẹ lên cho vừa vặn */
+        transform: translateX(-50%) scale(0.75) !important; /* CHÌA KHÓA ở đây */
+    }
+
+    /* 2. TRẦN DẦN & MỸ DIỆU: Giữ lại translateY(-50%) để nằm giữa 2 cạnh bên */
+    .opponent-wrapper.left-side {
+        left: 20px !important; 
+        top: 50%;
+        transform: translateY(-50%) scale(0.75) !important;
+    }
+    .opponent-wrapper.right-side {
+        right: 20px !important; 
+        transform: translateY(-50%) scale(0.75) !important;
+        top: 50%;
+    }
+
+    /* 3. NÚT BẤM: Hạ thấp xuống gần mặt bài hơn, không bị lơ lửng */
+    .action-buttons {
+        bottom:  160px !important; /* Giảm từ 100px xuống 75px */
+        transform: translateX(15%) scale(0.7) !important; 
+        width: max-content;
+    }
+
+    /* 4. BÀI CỦA BẠN */
+    .player-hand {
+        bottom: 50px !important; 
+        transform: translateX(-50%) scale(0.65) !important; 
+    }
+
+    /* 5. AVATAR BẢO SAM */
+    .player-info.bottom-left {
+        bottom: 70px !important; 
+        left: 120px !important;   
+        transform: scale(0.75) !important;
+        transform-origin: bottom left;
+    }
+
+    .player-emoji-panel {
+        left: 22% !important;
+        bottom: 120px !important;
+        transform: scale(0.8) !important;
+    }
+
+    /* 6. VÙNG ĐÁNH BÀI (Giữa bàn) */
+    .center-board {
+        top: 48% !important; /* Hạ xuống 1 xíu để nhường chỗ cho bài Lân Lê */
+        transform: translate(-50%, -50%) scale(0.7) !important;
+    }
+
+    /* Logo mờ thu nhỏ */
+    .table-center-logo h2 {
+        font-size: 50px !important;
+    }
+}
+/* =========================================
+   HIỆU ỨNG TỚI TRẮNG GIỮA BÀN (TRỰC DIỆN)
+   ========================================= */
+
+.toi-trang-celebration {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    pointer-events: none; /* Chuột xuyên qua để không cản trở thao tác khác */
+    width: 100%;
+}
+
+/* CHỮ TỚI TRẮNG: In hoa, to, gradient cầu vồng và bóng đổ */
+.toi-trang-text-center {
+    font-size: 80px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    margin-bottom: 30px;
+    
+    /* Màu Gradient Cầu Vồng */
+    background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00bfff, #4b0082, #9400d3);
+    -webkit-background-clip: text;
+    color: transparent;
+    
+    /* Bóng đen dày đằng sau để nổi bật trên nền đỏ của bàn */
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+    
+    /* Animation nảy lên lúc mới xuất hiện và đổi màu liên tục */
+    animation: zoomInBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, rainbowShift 4s linear infinite;
+}
+
+/* KHUNG CHỨA 4 CON HEO */
+.toi-trang-heos {
+    display: flex;
+    gap: 20px; /* Cách nhau ra cho thoáng */
+    animation: slideUpFade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* TỪNG CON HEO */
+.heo-card {
+    transform: scale(1.3); /* Phóng to 4 con heo lên 30% cho hoành tráng */
+    /* Hào quang vàng chói rực rỡ ôm sát lá bài */
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 140, 0, 0.7)); 
+}
+
+/* CÁC ANIMATION */
+@keyframes zoomInBounce {
+    0% { transform: scale(0.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUpFade {
+    0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes rainbowShift {
+    0% { filter: hue-rotate(0deg) drop-shadow(0 10px 15px rgba(0,0,0,0.9)); }
+    100% { filter: hue-rotate(360deg) drop-shadow(0 10px 15px rgba(0,0,0,0.9)); }
+}
+/* =========================================
+   HIỆU ỨNG TỚI TRẮNG GIỮA BÀN (TRỰC DIỆN)
+   ========================================= */
+
+.toi-trang-celebration {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    pointer-events: none; /* Chuột xuyên qua để không cản trở thao tác khác */
+    width: 100%;
+}
+
+/* CHỮ TỚI TRẮNG: In hoa, to, gradient cầu vồng và bóng đổ */
+.toi-trang-text-center {
+    font-size: 80px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 12px;
+    margin-bottom: 30px;
+    
+    /* Màu Gradient Cầu Vồng */
+    background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00bfff, #4b0082, #9400d3);
+    -webkit-background-clip: text;
+    color: transparent;
+    
+    /* Bóng đen dày đằng sau để nổi bật trên nền đỏ của bàn */
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+    
+    /* Animation nảy lên lúc mới xuất hiện và đổi màu liên tục */
+    animation: zoomInBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, rainbowShift 4s linear infinite;
+}
+
+/* KHUNG CHỨA 4 CON HEO */
+.toi-trang-heos {
+    display: flex;
+    gap: 20px; /* Cách nhau ra cho thoáng */
+    animation: slideUpFade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* TỪNG CON HEO */
+.heo-card {
+    transform: scale(1.3); /* Phóng to 4 con heo lên 30% cho hoành tráng */
+    /* Hào quang vàng chói rực rỡ ôm sát lá bài */
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 140, 0, 0.7)); 
+}
+
+/* CÁC ANIMATION */
+@keyframes zoomInBounce {
+    0% { transform: scale(0.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUpFade {
+    0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes rainbowShift {
+    0% { filter: hue-rotate(0deg) drop-shadow(0 10px 15px rgba(0,0,0,0.9)); }
+    100% { filter: hue-rotate(360deg) drop-shadow(0 10px 15px rgba(0,0,0,0.9)); }
+}
+/* =========================================
+   NÚT RỜI BÀN (LEAVE TABLE)
+   ========================================= */
+.btn-leave-table {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ffd700;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+}
+
+.btn-leave-table:hover {
+    background: #ffd700;
+    color: black;
+    transform: scale(1.05);
+}
+
+/* Kéo nút lên một xíu nếu xoay ngang trên điện thoại */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .btn-leave-table {
+        top: 10px;
+        left: 10px;
+        padding: 5px 15px;
+        font-size: 14px;
+    }
+}
+/* =========================================
+   HIỂN THỊ ID PHÒNG (GÓC PHẢI TRÊN CÙNG)
+   ========================================= */
+.room-id-display {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ffd700;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 1px;
+}
+
+/* Tô màu nổi bật cho chữ số ID */
+.room-id-display span {
+    color: #00ff00; /* Màu xanh lá Neon */
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Responsive: Kéo gọn lại khi xoay ngang điện thoại */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .room-id-display {
+        top: 10px;
+        right: 10px;
+        padding: 5px 15px;
+        font-size: 14px;
+    }
+    .room-id-display span {
+        font-size: 16px;
+    }
+}
+/* ========================================== */
+/* HIỆU ỨNG THÔNG BÁO NHANH (TOAST)           */
+/* ========================================== */
+.custom-toast-notification {
+    position: fixed;
+    top: 80px; /* Nằm cách viền trên một chút */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.6);
+    border: 2px solid #fff;
+    z-index: 10000;
+    pointer-events: none; /* Không cản trở click chuột ở dưới */
+    animation: slideDownFade 0.3s ease-out forwards;
+}
+
+@keyframes slideDownFade {
+    from { 
+        top: 40px; 
+        opacity: 0; 
+    }
+    to { 
+        top: 80px; 
+        opacity: 1; 
+    }
+}
+
+/* =========================================================
+   📱 TỐI ƯU CỰC HẠN CHO IPHONE 11 -> 15 PRO MAX (LANDSCAPE)
+   (Có xử lý né Tai Thỏ / Dynamic Island của Apple)
+   ========================================================= */
+@media screen and (max-height: 450px) and (orientation: landscape),
+       screen and (max-width: 950px) and (max-height: 500px) and (orientation: landscape) {
+
+    /* 1. KHUNG TỔNG: Ép tràn viền, giấu thanh cuộn */
+    .casino-room, #root, body {
+        overflow: hidden !important;
+        position: fixed; /* Khóa cứng không cho màn hình nảy lên xuống trên iOS */
+        width: 100vw; height: 100vh;
+    }
+
+    /* Thu hẹp bàn chơi vừa khít viền điện thoại */
+    .game-table {
+        width: 100vw !important; height: 100vh !important;
+        border-radius: 0 !important; border: none !important;
+    }
+
+    /* 2. KHU VỰC BÀI CỦA BẠN (Làm To Ra Dễ Bấm) */
+    .player-hand {
+        bottom: 0px !important; 
+        transform: translateX(-50%) scale(0.85) !important; 
+        transform-origin: bottom center;
+    }
+    
+    /* SỬA LỖI LỆCH TRÁI: Phải tách riêng Wrapper và Card ra */
+    /* Khi kéo thả (kéo nguyên cái khung bọc) */
+    .card-wrapper.dragging {
+        transform: translateX(-50%) translateY(-35px) scale(1.1) !important;
+    }
+    
+    /* Khi chỉ bấm chọn 1 lá bài (Chỉ thụt lên, KHÔNG đẩy sang trái) */
+    .player-hand .playing-card.selected {
+        transform: translateY(-25px) !important;
+    }
+    /* 3. AVATAR CỦA BẠN (Nằm xa ra xíu, né tai thỏ bên trái) */
+    .player-info.bottom-left {
+        /* Dùng env() để tự né tai thỏ của iPhone */
+        left: max(20px, env(safe-area-inset-left)) !important;   
+        bottom: 15px !important; 
+        transform: scale(0.75) !important;
+        transform-origin: bottom left;
+    }
+
+    /* 4. CỤM TƯƠNG TÁC: EMOJI (Nằm cạnh Avatar của bạn) */
+    .left-interaction-panel {
+        left: calc(max(20px, env(safe-area-inset-left)) + 80px) !important; 
+        bottom: 25px !important; 
+        transform: scale(0.75) !important;
+        transform-origin: bottom left;
+    }
+
+   /* 5. CỤM TƯƠNG TÁC: MIC & CHAT (Neo sát lề phải) */
+    .right-interaction-panel {
+        right: max(10px, env(safe-area-inset-right)) !important;
+        bottom: 80px !important; 
+        transform: scale(0.75) !important;
+        transform-origin: bottom right;
+        flex-direction: column; /* Xếp dọc Mic và Chat cho gọn */
+        gap: 15px !important;
+    }
+
+    /* 6. CỤM NÚT HÀNH ĐỘNG (Đánh bài, Bỏ lượt, Chọn lại) */
+    .action-buttons {
+        /* CỘNG THÊM 85px ĐỂ KÉO TOÀN BỘ CỤM NÚT SANG TRÁI NÉ MIC/CHAT */
+        right: calc(max(10px, env(safe-area-inset-right)) + 85px) !important;
+        bottom: 110px !important; /* Vẫn giữ độ cao để không đè lên 13 lá bài */
+        transform: scale(0.75) !important; 
+        transform-origin: bottom right;
+        gap: 8px !important;
+        z-index: 105 !important; /* Đảm bảo đè lên bài */
+    }
+    /* 7. BỐ CỤC 3 ĐỐI THỦ (Ép sát góc, né tai thỏ) */
+    /* Trần Dần (Left) */
+    .opponent-wrapper.left-side {
+        left: max(10px, env(safe-area-inset-left)) !important; 
+        top: 35% !important; /* Đẩy lên cao xíu để không cấn bài của bạn */
+        transform: translateY(-50%) scale(0.7) !important;
+    }
+
+    /* Mỹ Diệu (Right) */
+    .opponent-wrapper.right-side {
+        right: max(10px, env(safe-area-inset-right)) !important; 
+        top: 35% !important;
+        transform: translateY(-50%) scale(0.7) !important;
+    }
+
+    /* Lân Lê (Top) - Căn giữa chuẩn xác */
+    .opponent-wrapper.top {
+        top: 15px !important;
+        transform: translateX(-50%) scale(0.7) !important;
+    }
+
+    /* 8. VÙNG ĐÁNH BÀI & CÁC HIỆU ỨNG GIỮA BÀN */
+    .center-board {
+        top: 45% !important; 
+        transform: translate(-50%, -50%) scale(0.75) !important;
+    }
+    
+    .table-center-logo {
+        font-size: 40px !important; /* Thu nhỏ chữ Tiến Lên */
+    }
+
+    /* Bóp nhỏ bảng Tới Trắng */
+    .toi-trang-celebration {
+        transform: translate(-50%, -50%) scale(0.6) !important;
+    }
+
+    /* Bóp nhỏ bảng Tổng kết ván */
+    .end-game-panel {
+        transform: scale(0.75) !important;
+    }
+
+    /* 9. NÚT RỜI BÀN & ID PHÒNG (Nằm góc trên cùng) */
+    .btn-settings-toggle,
+    .btn-leave-table {
+        top: max(10px, env(safe-area-inset-top)) !important;
+        left: max(10px, env(safe-area-inset-left)) !important;
+        transform: scale(0.8) !important;
+        transform-origin: top left;
+    }
+
+    .room-id-display {
+        top: max(10px, env(safe-area-inset-top)) !important;
+        right: max(10px, env(safe-area-inset-right)) !important;
+        transform: scale(0.75) !important;
+        transform-origin: top right;
+    }
+}
+.center-board .flying-card:first-child {
+    margin-left: 0 !important;
+}
+/* =========================================
+   TOP PENALTY BANNER (CẢNH BÁO RỜI BÀN)
+========================================= */
+.top-penalty-banner {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Hiệu ứng nền trong suốt ở 2 đầu, đỏ ở giữa */
+    background: linear-gradient(90deg, rgba(231,76,60,0) 0%, rgba(192,57,43,0.9) 20%, rgba(192,57,43,0.9) 80%, rgba(231,76,60,0) 100%);
+    
+    color: #fff;
+    padding: 12px 60px;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    z-index: 10000;
+    pointer-events: none; /* Không cản trở click chuột */
+    
+    border-top: 2px solid #ff7675;
+    border-bottom: 2px solid #ff7675;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    
+    /* Hiệu ứng trượt xuống, dừng 2.5s rồi trượt lên */
+    animation: slideDownFadeOut 3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideDownFadeOut {
+    0%   { top: -60px; opacity: 0; }
+    10%  { top: 40px; opacity: 1; }  /* Hiện ra mượt mà */
+    85%  { top: 40px; opacity: 1; }  /* Đứng im cho người ta đọc */
+    100% { top: -60px; opacity: 0; } /* Trượt lên biến mất */
+}
+/* =========================================
+   POPUP CHÁY TÚI (HẾT TIỀN)
+========================================= */
+.broke-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    backdrop-filter: blur(5px);
+    animation: fadeInBroke 0.3s ease-out;
+}
+
+.broke-modal-content {
+    background: linear-gradient(135deg, #2c3e50, #e74c3c);
+    border: 3px solid #f1c40f;
+    border-radius: 15px;
+    padding: 30px 40px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+    max-width: 400px;
+    
+    /* Hiệu ứng rung lắc nhẹ khi hiện ra */
+    animation: shakeBroke 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.broke-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+    animation: floatMoney 2s infinite ease-in-out;
+}
+
+.broke-title {
+    font-size: 24px;
+    font-weight: 900;
+    margin: 0 0 15px 0;
+    color: #f1c40f;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    letter-spacing: 1px;
+}
+
+.broke-text {
+    font-size: 16px;
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.broke-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 25px;
+}
+
+.broke-btn-close, .broke-btn-deposit {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.broke-btn-close {
+    background-color: #7f8c8d;
+    color: white;
+}
+
+.broke-btn-close:hover {
+    background-color: #95a5a6;
+    transform: translateY(-2px);
+}
+
+.broke-btn-deposit {
+    background-color: #f1c40f;
+    color: #c0392b;
+    animation: pulseDeposit 1.5s infinite alternate;
+}
+
+.broke-btn-deposit:hover {
+    background-color: #f39c12;
+    transform: translateY(-2px);
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeInBroke { from { opacity: 0; } to { opacity: 1; } }
+@keyframes floatMoney { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulseDeposit { from { transform: scale(1); } to { transform: scale(1.05); } }
+@keyframes shakeBroke {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+/* =========================================
+   1. SỬA LỖI 3 ĐÔI THÔNG BỊ CẮT LÀM ĐÔI
+========================================= */
+.center-board {
+    overflow: visible !important; /* QUAN TRỌNG NHẤT: Bỏ lệnh cắt giấu bài đi */
+    width: 60%;
+    height: 60%;
+}
+.play-batch {
+    overflow: visible !important; 
+}
+.play-batch .flying-card {
+    position: relative;
+    margin-left: -40px; /* Chồng bài lên nhau một chút để chứa được 6-8 lá */
+}
+.play-batch .flying-card:first-child {
+    margin-left: 0;
+}
+
+/* =========================================
+   2. HOẠT ẢNH CHO POPUP CHÁY TÚI Ở SẢNH
+========================================= */
+.broke-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
+    z-index: 99999; backdrop-filter: blur(5px); animation: fadeInBroke 0.3s ease-out;
+}
+.broke-modal-content {
+    background: linear-gradient(135deg, #2c3e50, #e74c3c); border: 3px solid #f1c40f;
+    border-radius: 15px; padding: 30px 40px; text-align: center; color: white;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.8); max-width: 400px;
+    animation: shakeBroke 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+.broke-icon { font-size: 60px; margin-bottom: 10px; animation: floatMoney 2s infinite ease-in-out; }
+.broke-title { font-size: 24px; font-weight: 900; margin: 0 0 15px 0; color: #f1c40f; }
+.broke-text { font-size: 16px; margin: 5px 0; line-height: 1.4; }
+.broke-buttons { display: flex; justify-content: space-around; margin-top: 25px; }
+.broke-btn-close, .broke-btn-deposit { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+.broke-btn-close { background-color: #7f8c8d; color: white; }
+.broke-btn-close:hover { background-color: #95a5a6; transform: translateY(-2px); }
+.broke-btn-deposit { background-color: #f1c40f; color: #c0392b; animation: pulseDeposit 1.5s infinite alternate; }
+.broke-btn-deposit:hover { background-color: #f39c12; transform: translateY(-2px); }
+
+@keyframes fadeInBroke { from { opacity: 0; } to { opacity: 1; } }
+@keyframes floatMoney { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulseDeposit { from { transform: scale(1); } to { transform: scale(1.05); } }
+@keyframes shakeBroke {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* =======================================================
+   🟢 RESPONSIVE KHU VỰC NÚT GÓC TRÁI TRÊN (TRONG PHÒNG CHƠI)
+   ======================================================= */
+.top-left-controls {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-settings-toggle {
+    padding: 8px 15px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 2px solid #f1c40f;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.1s;
+}
+
+.btn-settings-toggle:active {
+    transform: scale(0.9);
+}
+
+.in-game-settings-panel {
+    position: absolute;
+    top: 60px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #f1c40f;
+    z-index: 101;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    width: max-content;
+}
+
+.in-game-settings-panel h3 {
+    margin: 0 0 10px 0;
+    color: #f1c40f;
+    text-align: center;
+}
+
+.setting-slider-row {
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 10px;
+}
+
+.setting-slider-row span.lbl { width: 70px; }
+.setting-slider-row span.val { width: 35px; text-align: right; }
+
+.btn-close-settings {
+    width: 100%;
+    padding: 8px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 🔥 ÉP NHỎ LẠI KHI Ở TRÊN ĐIỆN THOẠI (MÀN HÌNH NGANG) 🔥 */
+/* 🔥 ÉP NHỎ LẠI KHI Ở TRÊN ĐIỆN THOẠI (Bao gồm iPhone 11 -> 15 Pro Max xoay ngang) 🔥 */
+@media screen and (max-width: 950px) and (max-height: 500px), 
+       screen and (max-width: 950px) and (orientation: landscape) {
+    
+    .top-left-controls {
+        top: 5px;
+        left: 5px;
+        gap: 5px;
+    }
+
+    /* Thu nhỏ nút rời bàn */
+    .btn-settings-toggle,
+    .btn-leave-table {
+        position: static !important;
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+
+    /* Thu nhỏ nút cài đặt */
+   
+
+    /* Đẩy bảng cài đặt sát lên trên và thu nhỏ nội dung */
+    .in-game-settings-panel {
+        top: 40px;
+        left: 5px;
+        padding: 10px;
+    }
+
+    .in-game-settings-panel h3 { font-size: 14px; margin-bottom: 5px; }
+    .setting-slider-row { margin-bottom: 5px; font-size: 12px; }
+    .setting-slider-row span.lbl { width: 55px; }
+    .setting-slider-row input[type="range"] { width: 80px; } /* Thu ngắn thanh trượt */
+    .btn-close-settings { padding: 5px; font-size: 12px; }
+}
+.flying-card, .play-batch {
+    /* Ép trình duyệt dùng GPU để xử lý hiệu ứng bay bài thay vì dùng CPU */
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}

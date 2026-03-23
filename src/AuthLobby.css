@@ -1,0 +1,718 @@
+/* =========================================
+   GIAO DIỆN ĐĂNG NHẬP & SẢNH CHỜ
+   ========================================= */
+.auth-lobby-container {
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #2b1010 0%, #0a0a0a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- FORM ĐĂNG NHẬP / ĐĂNG KÝ --- */
+.auth-box {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffd700;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    z-index: 10;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.auth-logo {
+    font-size: 40px;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffea00;
+    margin-bottom: 30px;
+    letter-spacing: 5px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #555;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.3s;
+}
+.auth-input:focus { border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+
+.btn-auth {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to bottom, #ffea00, #d4af37);
+    color: #000;
+    font-weight: 900;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #997a00;
+    margin-bottom: 15px;
+}
+.btn-auth:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
+
+.toggle-auth { color: #aaa; cursor: pointer; font-size: 14px; text-decoration: underline; }
+.toggle-auth:hover { color: #ffd700; }
+
+.bonus-msg { color: #00ff00; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
+
+/* --- GIAO DIỆN SẢNH (LOBBY) --- */
+.lobby-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP BAR */
+.lobby-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0));
+    border-bottom: 1px solid rgba(255,215,0,0.3);
+}
+
+.user-profile { display: flex; align-items: center; gap: 15px; }
+.default-avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #333 url('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix') center/cover;
+    border: 2px solid #ffd700; box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+.user-info h3 { margin: 0; color: #fff; font-size: 20px; }
+.user-info p { margin: 5px 0 0; color: #aaa; font-size: 14px; }
+
+.user-wallet {
+    background: rgba(0,0,0,0.6); border: 1px solid #d4af37;
+    padding: 10px 20px; border-radius: 20px; text-align: center;
+}
+.wallet-money { color: #00ff00; font-size: 22px; font-weight: 900; text-shadow: 0 0 10px #00ff00; }
+.wallet-label { color: #ffd700; font-size: 12px; font-weight: bold; }
+
+.lobby-settings { display: flex; gap: 15px; }
+.btn-icon {
+    background: rgba(255,255,255,0.1); border: 1px solid #555;
+    color: white; font-size: 24px; width: 50px; height: 50px;
+    border-radius: 50%; cursor: pointer; transition: 0.2s;
+}
+.btn-icon:hover { background: #ffd700; color: black; border-color: #ffd700; }
+
+/* MAIN LOBBY CONTENT (2 Ô VUÔNG TO) */
+.lobby-content {
+    flex: 1; display: flex; justify-content: center; align-items: center; gap: 50px;
+}
+
+.room-card {
+    width: 300px; height: 350px;
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 3px solid #555; border-radius: 30px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    position: relative; overflow: hidden;
+}
+.room-card:hover {
+    transform: translateY(-20px) scale(1.05);
+    border-color: #ffd700;
+    box-shadow: 0 30px 60px rgba(255,215,0,0.2);
+}
+.room-icon { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); }
+.room-title { font-size: 28px; font-weight: 900; color: white; text-transform: uppercase; }
+.room-desc { color: #aaa; margin-top: 10px; font-size: 16px; }
+
+/* Modal Nhập ID */
+.join-id-input {
+    position: absolute; bottom: 30px; width: 80%;
+    padding: 10px; text-align: center; border-radius: 10px;
+    border: 2px solid #ffd700; background: #000; color: #fff;
+    font-size: 18px; font-weight: bold; outline: none;
+}
+/* =========================================
+   MODAL CHỈNH SỬA HỒ SƠ (AVATAR & TÊN)
+   ========================================= */
+
+/* Lớp phủ đen mờ đằng sau popup */
+.profile-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85); z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+/* Khung popup chính */
+.profile-modal {
+    background: linear-gradient(145deg, #2b2b2b, #111111);
+    border: 2px solid #ffd700; border-radius: 20px;
+    padding: 30px; width: 350px; text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 215, 0, 0.2);
+    animation: popInModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInModal {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.profile-modal h2 { color: #ffd700; margin-top: 0; margin-bottom: 20px; }
+
+/* Khu vực bấm vào để chọn ảnh */
+.avatar-edit-container {
+    position: relative; width: 120px; height: 120px; 
+    margin: 0 auto 25px; cursor: pointer;
+    transition: transform 0.2s;
+}
+.avatar-edit-container:hover { transform: scale(1.05); }
+
+.avatar-preview {
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    border: 4px solid #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    background-color: #333;
+}
+
+/* Nút hình cái bút (Icon Edit) đè lên góc avatar */
+.avatar-edit-icon {
+    position: absolute; bottom: 0; right: 0;
+    background: #ffd700; color: #000;
+    width: 35px; height: 35px; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 18px; border: 2px solid #111;
+}
+
+/* Ẩn cái thẻ input file mặc định xấu xí của HTML đi */
+.file-input-hidden { display: none; }
+
+/* Nút Lưu và Hủy */
+.btn-save-profile {
+    width: 100%; padding: 12px; background: linear-gradient(to bottom, #ffea00, #d4af37);
+    color: #000; font-weight: 900; font-size: 16px; border: none; border-radius: 10px;
+    cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #997a00;
+}
+.btn-save-profile:active { transform: translateY(4px); box-shadow: none; }
+
+.btn-close-modal {
+    width: 100%; padding: 10px; background: transparent; color: #aaa;
+    border: 1px solid #555; border-radius: 10px; cursor: pointer; margin-top: 10px;
+    font-size: 14px;
+}
+.btn-close-modal:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* Thêm hiệu ứng nhấp nháy chỉ dẫn bấm vào Avatar ở Lobby */
+.default-avatar.clickable { cursor: pointer; transition: 0.2s; }
+.default-avatar.clickable:hover { filter: brightness(1.2); box-shadow: 0 0 20px #ffd700; }
+/* =========================================
+   THANH TRƯỢT ÂM LƯỢNG (SLIDER)
+   ========================================= */
+
+.volume-control {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.volume-label {
+    display: flex;
+    justify-content: space-between;
+    color: #ffd700;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* Biến hóa thanh trượt mặc định */
+.styled-slider {
+    -webkit-appearance: none; /* Tắt giao diện gốc */
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+}
+
+/* Cục nắm kéo (Thumb) cho Chrome, Safari, Edge */
+.styled-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffea00 0%, #d4af37 100%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 2px 5px rgba(0,0,0,0.9);
+    transition: transform 0.1s;
+}
+
+.styled-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 1);
+}
+
+/* Cục nắm kéo (Thumb) cho Firefox */
+.styled-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffea00 0%, #d4af37 100%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 2px 5px rgba(0,0,0,0.9);
+    border: none;
+    transition: transform 0.1s;
+}
+.styled-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+/* =========================================
+   BẢNG BẤM SỐ (NUMPAD ẢO)
+   ========================================= */
+
+.numpad-modal {
+    background: linear-gradient(145deg, #1a1a1a, #000000);
+    border: 2px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 215, 0, 0.2);
+    animation: popInModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Màn hình hiển thị số đang nhập */
+.numpad-display {
+    background: #000;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.numpad-char {
+    font-size: 36px;
+    font-weight: 900;
+    color: #00ff00; /* Số màu xanh lá nổi bật */
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    width: 30px;
+    border-bottom: 3px solid #333;
+}
+
+/* Lưới 3x4 chứa các nút bấm */
+.numpad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.numpad-btn {
+    background: linear-gradient(to bottom, #444, #222);
+    border: 2px solid #555;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    height: 60px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #111;
+    transition: all 0.1s;
+    user-select: none; /* Không cho bôi đen khi bấm nhanh */
+}
+
+.numpad-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+    background: #555;
+}
+
+/* Nút Xóa (C) và Nút Đồng Ý (OK) có màu riêng */
+.btn-clear { color: #ff4444; }
+.btn-ok { background: linear-gradient(to bottom, #ffea00, #d4af37); color: #000; border-color: #ffd700; box-shadow: 0 4px 0 #997a00; }
+.btn-ok:active { background: #d4af37; box-shadow: none; }
+
+/* =========================================
+   CẬP NHẬT GIAO DIỆN LOBBY CONTENT CHO 3 NÚT
+   ========================================= */
+.lobby-content {
+    flex: 1; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 30px; /* Thu hẹp gap lại một chút để vừa 3 thẻ */
+    flex-wrap: wrap; /* Nếu màn hình nhỏ thì tự rớt dòng */
+}
+
+.room-card {
+    width: 260px; /* Thu nhỏ thẻ một chút để vừa 3 cái */
+    height: 320px;
+}
+/* ========================================== */
+/* HIỆU ỨNG CHỮ CHẠY NGANG CHO PLAYLIST NHẠC  */
+/* ========================================== */
+.marquee-container {
+    flex: 1; /* Tự động chiếm hết khoảng trống còn lại */
+    overflow: hidden; /* Giấu phần chữ bị tràn ra ngoài */
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.marquee-text {
+    display: inline-block;
+    padding-left: 100%; /* Bắt đầu trôi từ tít bên mép phải */
+    animation: scroll-left 6s linear infinite; /* 6s là tốc độ trôi, có thể chỉnh lại */
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+/* ========================================== */
+/* KHUNG THÔNG BÁO SERVER CHẠY CHỮ (GLOBAL)   */
+/* ========================================== */
+.global-announcement-bar {
+    position: fixed;
+    top: 100px; /* Nằm sát mép trên màn hình */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    min-width: 400px;
+    background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0) 100%);
+    border-top: 2px solid #f1c40f;
+    border-bottom: 2px solid #f1c40f;
+    padding: 8px 0;
+    z-index: 9999;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(241, 196, 15, 0.3);
+}
+
+.global-announcement-text {
+    display: inline-block;
+    padding-left: 100%;
+    color: #f1c40f;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+    animation: scroll-announcement 10s linear infinite; /* Chạy ngang 10 giây */
+}
+
+@keyframes scroll-announcement {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+/* ========================================== */
+/* RESPONSIVE: TỐI ƯU FORM CHO ĐIỆN THOẠI     */
+/* ========================================== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    /* ========================================== */
+    /* ÉP MỠ BẢNG NHẬP ID PHÒNG (NUMPAD)          */
+    /* ========================================== */
+    .numpad-modal {
+        transform: scale(0.65) !important; /* Ép nhỏ mạnh tay hơn nữa */
+        padding: 15px !important; 
+        width: 320px !important; /* Bóp chiều ngang cho thon gọn */
+    }
+    
+    .numpad-modal h2 {
+        font-size: 22px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Thu hẹp màn hình hiển thị số */
+    .numpad-display {
+        padding: 8px !important;
+        margin-bottom: 10px !important;
+    }
+    .numpad-char {
+        font-size: 24px !important;
+        width: 30px !important;
+        height: 40px !important;
+        line-height: 40px !important;
+    }
+
+    /* Ép các nút bấm xích lại gần nhau và lùn bớt */
+    .numpad-grid {
+        gap: 5px !important; 
+    }
+
+    .numpad-btn {
+        padding: 8px !important; 
+        font-size: 18px !important;
+        border-radius: 8px !important;
+    }
+
+    /* Thu nhỏ nút Đóng */
+    .numpad-modal .btn-close-modal {
+        margin-top: 10px !important;
+        padding: 8px !important;
+        font-size: 14px !important;
+    }
+    /* Ép khung chứa tổng không bị tràn cuộn */
+    .auth-lobby-container {
+        overflow: hidden; 
+    }
+
+    /* Thu nhỏ Form Đăng Nhập */
+    .auth-box {
+        transform: scale(0.8); /* Thu nhỏ form còn 80% */
+        transform-origin: center center;
+        padding: 15px 25px; /* Giảm độ béo của form */
+        margin-top: 0;
+    }
+
+    /* Giảm kích thước logo Tiến Lên */
+    .auth-logo {
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+
+    /* Thu hẹp khoảng cách các ô Input */
+    .auth-box > div {
+        margin-bottom: 10px !important; 
+    }
+
+    .auth-input {
+        padding: 8px 12px; /* Dẹp bớt chiều cao ô chữ */
+    }
+
+    .btn-auth {
+        padding: 10px;
+        margin-top: 5px;
+    }
+}
+/* ========================================== */
+/* RESPONSIVE: TỐI ƯU FORM CHO ĐIỆN THOẠI     */
+/* ========================================== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    /* Ép khung chứa tổng không bị tràn cuộn */
+    .auth-lobby-container {
+        overflow: hidden; 
+    }
+
+    /* Thu nhỏ Form Đăng Nhập */
+    .auth-box {
+        transform: scale(0.8); /* Thu nhỏ form còn 80% */
+        transform-origin: center center;
+        padding: 15px 25px; /* Giảm độ béo của form */
+        margin-top: 0;
+    }
+
+    /* Giảm kích thước logo Tiến Lên */
+    .auth-logo {
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+
+    /* Thu hẹp khoảng cách các ô Input */
+    .auth-box > div {
+        margin-bottom: 10px !important; 
+    }
+
+    .auth-input {
+        padding: 8px 12px; /* Dẹp bớt chiều cao ô chữ */
+    }
+
+    .btn-auth {
+        padding: 10px;
+        margin-top: 5px;
+    }
+}
+/* ========================================== */
+/* MÀN HÌNH ÉP XOAY NGANG ĐIỆN THOẠI          */
+/* ========================================== */
+.portrait-warning {
+    display: none; /* Mặc định là giấu đi */
+}
+
+/* KHI ĐIỆN THOẠI CẦM DỌC (PORTRAIT) -> HIỆN LÊN ĐÈ HẾT MỌI THỨ */
+@media screen and (orientation: portrait) {
+    .portrait-warning {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle, #2c3e50, #000000);
+        color: #f1c40f;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 9999999; /* Số to chà bá để đè lên mọi Modal/Toast */
+        text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Tiện tay giấu luôn cái khung game ở dưới cho nhẹ máy */
+    .auth-lobby-container {
+        display: none !important;
+    }
+}
+/* ========================================== */
+/* TỐI ƯU GIAO DIỆN SẢNH CHÍNH CHO ĐIỆN THOẠI */
+/* ========================================== */
+@media screen and (max-height: 500px) and (orientation: landscape),
+       screen and (max-width: 950px) and (orientation: landscape) {
+       
+    /* 1. Thu gọn Thanh công cụ trên cùng */
+    .lobby-topbar {
+        padding: 5px 15px;
+    }
+    
+    /* Thu nhỏ Avatar và tên */
+    .user-profile .default-avatar {
+        width: 40px; height: 40px;
+    }
+    .user-info h3 { font-size: 15px; margin: 0; }
+    .user-info p { font-size: 11px; margin: 0; }
+    
+   /* ========================================== */
+    /* CĂN CHỈNH CỤM NÚT BÊN PHẢI ĐỀU TĂM TẮP      */
+    /* ========================================== */
+    .lobby-settings {
+        display: flex !important;
+        align-items: center !important; /* Ép tất cả nằm giữa theo trục dọc */
+        gap: 6px !important; /* Khoảng cách đều nhau */
+    }
+   
+    /* 1. Nút Tặng Quà và BXH (Là 2 thẻ div đầu tiên) */
+   .lobby-settings > div:nth-child(1),
+    .lobby-settings > div:nth-child(2) {
+        height: 48px !important; /* Bơm to từ 32px lên 42px */
+        padding: 0 12px !important; /* Cho nút mập mạp ra để dễ bấm */
+        margin: 0 !important;
+        border-radius: 25px !important; /* Bo góc tròn trịa hơn */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* 2. Phóng to Icon 🎁 và 🏆 bên trong */
+    .lobby-settings > div:nth-child(1) > span:nth-child(1),
+    .lobby-settings > div:nth-child(2) > span:nth-child(1) {
+        font-size: 24px !important; /* Tăng size icon lên cho hoành tráng */
+    }
+
+
+    /* Ẩn chữ "TẶNG" và "BXH" */
+    .lobby-settings > div:nth-child(1) > span:nth-child(2),
+    .lobby-settings > div:nth-child(2) > span:nth-child(2) {
+        display: none !important; 
+    }
+
+    /* 2. Sửa lỗi cái khung bọc Nút Nhạc (Là thẻ div thứ 3) */
+    .lobby-settings > div:nth-child(3) {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    /* 3. Nút Nhạc và Nút Cài đặt (btn-icon) */
+    .btn-icon {
+        width: 46px !important; 
+        height: 46px !important; 
+        font-size: 16px !important; 
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Thu nhỏ ví tiền một chút xíu nữa cho an toàn tuyệt đối */
+    .wallet-money {
+        font-size: 14px !important;
+        padding: 3px 10px !important;
+        white-space: nowrap !important; 
+    }
+    /* 2. Ép 3 Thẻ bài (Tạo Phòng, Chơi Ngay) vừa khít */
+    .lobby-content {
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .room-card {
+        width: 150px;
+        padding: 15px 10px;
+    }
+    .room-icon { font-size: 35px; margin-bottom: 5px; }
+    .room-title { font-size: 15px; }
+    .room-desc { font-size: 11px; }
+    
+    /* ========================================== */
+    /* 3. TUYỆT CHIÊU BÓP MODAL (Cài đặt, BXH, Tặng quà, Nhạc) */
+    /* ========================================== */
+    .profile-modal, 
+    .numpad-modal,
+    /* Bắt trúng cả bảng BXH và Xác nhận tặng (dùng inline-style) */
+    div[style*="zIndex: 1001"] > div,
+    div[style*="zIndex: 2000"] > div,
+    /* Bắt trúng cái danh sách Nhạc đang thả nổi */
+    .lobby-settings > div > div[style*="absolute"] {
+        transform: scale(0.75) !important;
+        transform-origin: center center !important;
+        
+        /* 2 DÒNG SINH TỬ ĐỂ CHỐNG LỖI "PHÌNH TO RỒI THU NHỎ" */
+        animation: none !important; 
+        transition: none !important; 
+    }
+
+    /* Riêng danh sách nhạc thì neo từ góc phải trên xuống cho không bị lệch */
+    .lobby-settings > div > div[style*="absolute"] {
+        transform-origin: top right !important;
+    }
+
+    /* Thu nhỏ khung cuộn của BXH */
+    .leaderboard-scroll {
+        max-height: 50vh !important;
+    }
+}
+/* ========================================== */
+/* HIỆU ỨNG VÒNG XOAY LOADING CHUYÊN NGHIỆP   */
+/* ========================================== */
+.modal-loading-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    border-radius: 20px; /* Bo góc khớp với cái bảng */
+    backdrop-filter: blur(4px); /* Làm mờ phần nền bên dưới cực đẹp */
+}
+
+.loading-spinner-large {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(241, 196, 15, 0.2);
+    border-top: 6px solid #f1c40f; /* Màu vàng Tiến Lên */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite; /* Xoay tít thò lò */
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

@@ -1,0 +1,103 @@
+/* =========================================
+   GIAO DIỆN BÀI NGƯỜI CHƠI (TÁCH XA BÀI)
+   ========================================= */
+
+.player-hand {
+    position: absolute;
+    bottom: -40px; 
+    left: 50%;
+    transform: translateX(-50%);
+    height: 140px; 
+    width: 600px;  
+    z-index: 100;
+}
+
+/* 1. WRAPPER "TÀNG HÌNH" */
+.card-wrapper {
+    position: absolute !important;
+    bottom: 0;
+    transform: translateX(-50%); /* Canh giữa chuẩn xác */
+    transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.15s ease-out;
+    
+    /* XÓA BỎ width, height, và clip-path ở wrapper để tránh xung đột */
+    
+    /* TUYỆT KỸ BÓNG MA: Cho phép chuột đâm xuyên qua cái khung này */
+    pointer-events: none; 
+}
+
+/* 2. ÉP LÁ BÀI HỆT LỆCH TRÁI VÀ BẮT CLICK TẠI ĐÂY */
+.card-wrapper .playing-card {
+    /* Ép lá bài trở lại làm vật thể vật lý để bắt click/kéo thả */
+    pointer-events: auto; 
+    
+    /* TRIỆT TIÊU THỦ PHẠM LỆCH TRÁI: Xóa bỏ cái margin-left: -65px của code cũ */
+    margin-left: 0 !important; 
+}
+
+/* 3. HIỆU ỨNG CON TRỎ KHI BẬT KÉO THẢ */
+.card-wrapper.draggable-mode .playing-card {
+    cursor: grab;
+}
+.card-wrapper.draggable-mode:active .playing-card {
+    cursor: grabbing;
+}
+
+/* 4. HIỆU ỨNG NHẤC BÀI */
+.card-wrapper.dragging {
+    opacity: 0.9;
+    transform: translateX(-50%) translateY(-30px) scale(1.1) !important; 
+    transition: none !important; 
+    z-index: 999 !important;
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.7));
+}/* =========================================
+   GIAO DIỆN BÀI NGƯỜI CHƠI (TÁCH XA BÀI)
+   ========================================= */
+
+.player-hand {
+    position: absolute;
+    bottom: -40px; 
+    left: 50%;
+    transform: translateX(-50%);
+    height: 140px; 
+    width: 600px;  
+    z-index: 100;
+}
+
+/* 1. WRAPPER "TÀNG HÌNH" */
+.card-wrapper {
+    position: absolute !important;
+    bottom: 0;
+    transform: translateX(-50%); /* Canh giữa chuẩn xác */
+    transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.15s ease-out;
+    
+    /* XÓA BỎ width, height, và clip-path ở wrapper để tránh xung đột */
+    
+    /* TUYỆT KỸ BÓNG MA: Cho phép chuột đâm xuyên qua cái khung này */
+    pointer-events: none; 
+}
+
+/* 2. ÉP LÁ BÀI HỆT LỆCH TRÁI VÀ BẮT CLICK TẠI ĐÂY */
+.card-wrapper .playing-card {
+    /* Ép lá bài trở lại làm vật thể vật lý để bắt click/kéo thả */
+    pointer-events: auto; 
+    
+    /* TRIỆT TIÊU THỦ PHẠM LỆCH TRÁI: Xóa bỏ cái margin-left: -65px của code cũ */
+    margin-left: 0 !important; 
+}
+
+/* 3. HIỆU ỨNG CON TRỎ KHI BẬT KÉO THẢ */
+.card-wrapper.draggable-mode .playing-card {
+    cursor: grab;
+}
+.card-wrapper.draggable-mode:active .playing-card {
+    cursor: grabbing;
+}
+
+/* 4. HIỆU ỨNG NHẤC BÀI */
+.card-wrapper.dragging {
+    opacity: 0.9;
+    transform: translateX(-50%) translateY(-30px) scale(1.1) !important; 
+    transition: none !important; 
+    z-index: 999 !important;
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.7));
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Tiến Lên VIP",
+  "short_name": "Tiến Lên",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#f1c40f",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>Tiến Lên</title>
+  </head>
+  <body>
+    <div id="root">
+      <style>
+        body { margin: 0; background-color: #1a252f; } /* Chống chớp trắng nền */
+        .initial-loader-container {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          width: 100vw;
+          background: radial-gradient(circle, #2c3e50, #000000);
+          color: #f1c40f;
+          font-family: sans-serif;
+        }
+        .card-spinner {
+          width: 60px;
+          height: 80px;
+          background-color: #fff;
+          border-radius: 5px;
+          border: 2px solid #333;
+          animation: flipCard 1.2s infinite ease-in-out;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+        @keyframes flipCard {
+          0% { transform: perspective(400px) rotateY(0); background-color: #fff; }
+          50% { transform: perspective(400px) rotateY(180deg); background-color: #e74c3c; }
+          100% { transform: perspective(400px) rotateY(360deg); background-color: #fff; }
+        }
+        .loading-text {
+          font-size: 20px;
+          font-weight: bold;
+          letter-spacing: 2px;
+          animation: pulseText 1.5s infinite;
+        }
+        @keyframes pulseText {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      </style>
+
+      <div class="initial-loader-container">
+        <div class="card-spinner"></div>
+        <div class="loading-text">ĐANG TẢI GAME...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

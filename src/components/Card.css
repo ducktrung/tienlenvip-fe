@@ -1,0 +1,69 @@
+/* client/src/components/Card.css */
+
+/* client/src/components/Card.css */
+
+.playing-card {
+    /* Trả lại kích thước gốc của file ảnh */
+    width: 110px; 
+    height: 110px; 
+    
+    margin-left: -65px; 
+    position: relative;
+    cursor: pointer;
+    
+    /* Tăng tốc độ nảy bài lên 0.08s (Nhanh như điện) để có cảm giác game xịn */
+    transition: transform 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    
+    /* ---------------------------------------------------------
+       SỬA LỖI CHẠM NHẦM BÀI: BẮT BUỘC DÙNG PHẦN TRĂM (%)
+       Thay vì cắt cứng 15px, ta cắt 14%. 
+       Dù lá bài có bị bóp nhỏ cỡ nào, vùng bấm (hitbox) vẫn luôn chuẩn xác!
+       --------------------------------------------------------- */
+    clip-path: inset(4% 14% 4% 14%) !important; 
+    
+    /* ---------------------------------------------------------
+       SỬA LỖI DELAY 300MS CỦA ĐIỆN THOẠI
+       Ra lệnh cho Safari/Chrome: "Bấm là ăn ngay, cấm chờ đợi!"
+       --------------------------------------------------------- */
+    touch-action: manipulation !important; 
+    
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none;
+}
+
+.playing-card:first-child {
+    margin-left: 0;
+}
+
+.playing-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 8px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
+}
+
+/* Hiệu ứng nhô lên khi người chơi click chọn bài */
+.playing-card.selected {
+    transform: translateY(-25px);
+}
+/* =========================================
+   HIỆU ỨNG RUNG LỖI (SHAKE ERROR)
+   ========================================= */
+@keyframes shakeError {
+    0%, 100% { transform: translateY(-25px) translateX(0); }
+    20% { transform: translateY(-25px) translateX(-6px) rotate(-2deg); }
+    40% { transform: translateY(-25px) translateX(6px) rotate(2deg); }
+    60% { transform: translateY(-25px) translateX(-6px) rotate(-2deg); }
+    80% { transform: translateY(-25px) translateX(6px) rotate(2deg); }
+}
+
+.playing-card.selected.shake-error {
+    /* Rung liên tục trong 0.4s */
+    animation: shakeError 0.4s ease-in-out; 
+    
+    /* Phủ một lớp bóng mờ màu đỏ gắt để báo lỗi */
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8)); 
+}

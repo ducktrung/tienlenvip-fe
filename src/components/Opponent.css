@@ -1,0 +1,450 @@
+/* Bọc toàn bộ đối thủ (Gồm Avatar + Bài) */
+.opponent-wrapper {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Khoảng cách giữa Avatar và Xấp bài */
+    z-index: 5;
+}
+
+/* ĐỊNH VỊ VÀ ĐẢO CHIỀU LINH HOẠT THEO VỊ TRÍ NGỒI */
+/* Ngồi bên trái: Avatar nằm trái, bài xòe ra hướng vào giữa bàn */
+.left-side { 
+    left: 30px; 
+    top: 35%; 
+    flex-direction: row; 
+}
+/* Ngồi bên phải: Bài xòe hướng vào giữa bàn, Avatar nằm ngoài cùng bên phải */
+.right-side { 
+    right: 30px; 
+    top: 35%; 
+    flex-direction: row-reverse; 
+}
+/* Ngồi phía trên: Avatar ở trên, bài xòe ở dưới */
+.top { 
+    top: 0px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    flex-direction: column; 
+    gap: 5px;
+}
+
+/* --- KHU VỰC AVATAR --- */
+/* --- KHU VỰC AVATAR --- */
+.opp-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.opp-avatar {
+    width: 65px;
+    height: 65px;
+    background-color: #333;
+    
+    /* 1. SỬA Ở ĐÂY: Biến khung ngoài thành hình tròn */
+    border-radius: 50%; 
+    
+    border: 2px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    position: relative; 
+}
+
+.opp-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    /* 2. SỬA Ở ĐÂY: Biến bức ảnh bên trong thành hình tròn theo khung */
+    border-radius: 50%; 
+}
+
+/* Các phần text giữ nguyên... */
+.opp-info-text {
+    text-align: center;
+    color: white;
+    margin-top: 4px;
+    text-shadow: 1px 1px 2px black;
+}
+.opp-name { font-size: 14px; font-weight: bold; color: #64b5f6; }
+.opp-money { font-size: 12px; color: #ffd700; }
+/* --- KHU VỰC BÀI XÒE --- */
+.opp-cards-fan {
+    display: flex;
+    align-items: center;
+}
+
+.opp-card-back-wrapper {
+    width: 45px; 
+    height: auto;
+    
+    /* 1. THU HẸP BỘ BÀI: Tăng độ âm để các lá bài đè sát vào nhau hơn.
+       (Bạn có thể thử -38px hoặc -40px. Số càng gần -45px thì xấp bài càng ngắn) */
+    margin-left: -38px; 
+    
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* Lá bài đầu tiên không bị lẹm */
+.opp-card-back-wrapper:first-child {
+    margin-left: 0;
+}
+
+.opp-card-back-wrapper img {
+    width: 100%;
+    display: block;
+    border-radius: 4px;
+    
+    
+    /* 2. XÓA BÓNG ĐỔ: Sửa thành none để lá bài phẳng và sắc nét */
+    box-shadow: none;
+}
+
+/* --- CON SỐ BÊN GÓC DƯỚI LÁ BÀI CUỐI --- */
+.opp-card-count-text {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    font-family: Arial, Helvetica, sans-serif;
+    /* Viền đen siêu đậm xung quanh chữ để nổi bật trên nền đỏ của bài */
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000,
+         2px  2px 3px rgba(0,0,0,0.8);
+    z-index: 2;
+}
+/* =========================================
+   HIỆU ỨNG BỎ LƯỢT (PASS)
+   ========================================= */
+.opponent-wrapper.passed {
+    opacity: 0.5; /* Làm mờ người chơi đã bỏ lượt */
+    filter: grayscale(0.5);
+    transition: all 0.3s;
+}
+
+.opp-passed-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 11px;
+    z-index: 10;
+    border: 1px solid white;
+    white-space: nowrap;
+}
+
+/* Thêm màu cho nút BỎ QUA của mình */
+.btn-red {
+    background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 100%);
+}
+/* =========================================
+   GIAO DIỆN TROLL MENU
+   ========================================= */
+.troll-menu {
+    position: absolute;
+    top: -75px; /* Đẩy lên cao hơn một chút vì menu giờ to hơn */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 15, 15, 0.95); /* Nền đen đậm hơn */
+    border-radius: 30px; /* Bo góc tròn trịa nguyên dải menu */
+    display: flex;
+    gap: 8px; /* Khoảng cách giữa các nút */
+    padding: 8px 12px;
+    z-index: 1000;
+    
+    /* Viền vàng phát sáng bọc ngoài menu */
+    border: 2px solid #ffde59; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 15px rgba(255, 222, 89, 0.3);
+    
+    pointer-events: auto;
+    white-space: nowrap; /* Đảm bảo menu luôn dàn hàng ngang, không rớt dòng */
+}
+
+/* Từng ô bấm (Touch Target) riêng biệt bên trong */
+.troll-menu span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Kích thước nút chuẩn Apple/Google cho ngón tay (tối thiểu 44px) */
+    width: 48px; 
+    height: 48px; 
+    font-size: 28px; /* Tăng size Emoji */
+    
+    background: rgba(255, 255, 255, 0.08); /* Nền xám trong suốt nhẹ cho mỗi nút */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Viền mờ phân tách các nút */
+    border-radius: 14px; /* Bo góc từng nút vuông */
+    
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Đổ bóng chìm tạo cảm giác nút lõm */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hiệu ứng khi ngón tay chạm vào (hoặc chuột di lên) */
+.troll-menu span:hover, .troll-menu span:active {
+    transform: scale(1.15) translateY(-5px); /* Nảy to lên và nảy lên trên */
+    background: rgba(255, 222, 89, 0.2); /* Nền chuyển sang vàng nhạt */
+    border-color: #ffde59; /* Viền sáng rực lên */
+    box-shadow: 0 0 12px #ffde59; /* Toả hào quang vàng */
+    z-index: 2;
+}
+
+/* =========================================
+   RESPONSIVE (ĐIỀU CHỈNH RIÊNG CHO MÀN HÌNH ĐIỆN THOẠI NHỎ)
+   ========================================= */
+@media (max-width: 600px) {
+    .troll-menu {
+        top: -65px;
+        gap: 5px;
+        padding: 6px 8px;
+    }
+    .troll-menu span {
+        width: 40px; 
+        height: 40px;
+        font-size: 24px;
+        border-radius: 10px;
+    }
+}
+/* =========================================
+   HIỆU ỨNG ANIMATION CHO VŨ KHÍ TROLL
+   ========================================= */
+.troll-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 110; /* Nằm đè lên tất cả mọi thứ */
+    pointer-events: none;
+    
+    /* Chỉnh kích thước to gấp 2.5 lần Avatar (Avatar là 65px) */
+    width: 160px; 
+    height: 160px;
+    
+    /* Cấu hình hiển thị ảnh vừa vặn, không bị cắt xén */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* GẮN ĐƯỜNG DẪN CÁC FILE GIF CỦA BẠN VÀO ĐÂY */
+.tomato-splat {
+    animation: showGifEffect 1.5s forwards;
+}
+
+.explosion {
+    width: 220px; /* Bom nổ thì cho to chà bá luôn */
+    height: 220px;
+    animation: showGifEffect 1s forwards;
+}
+
+.burning {
+    animation: showGifEffect 1.5s forwards;
+}
+
+.punch {
+    /* Điều chỉnh Width và Height tùy theo tỷ lệ gốc của file GIF meme của bạn */
+    width: 250px; 
+    height: 180px; 
+    
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Chạy trong 2 giây để xem hết ảnh động meme rồi mới biến mất */
+    animation: showGifEffect 4s forwards; 
+    
+    /* (Tùy chọn) Thêm margin nếu meme bị lệch khỏi tâm Avatar */
+    /* margin-top: -20px; */ 
+}
+/* CSS CHỈ LÀM NHIỆM VỤ HIỆN LÊN VÀ MỜ DẦN ĐI (Animation nổ đã có GIF lo) */
+@keyframes showGifEffect {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1); } /* Giữ nguyên cho GIF chạy đoạn nổ */
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); } /* Biến mất nhẹ nhàng */
+}
+/* =========================================
+   HIỆU ỨNG MEME GIF CỦA BẠN (HÌNH CHỮ NHẬT NGANG)
+   ========================================= */
+.slap-meme {
+    /* Set kích thước hình chữ nhật để vừa với file GIF 2 nhân vật */
+    width: 240px; 
+    height: 140px; 
+    
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Tôi set thời gian là 2s để GIF kịp chạy hết hành động tát */
+    animation: showGifEffect 4s forwards; 
+    
+    /* Canh chỉnh lại một chút để bàn tay tát trúng ngay mặt Avatar đối thủ */
+    margin-left: 20px; 
+}
+.nuclear {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Set kích thước cực lớn để choán hết 1/4 màn hình */
+    width: 250px; 
+    height: 150px;
+    
+    /* Animation nổ và mờ dần */
+    animation: nuclearShow 3s ease-out forwards; 
+    z-index: 1000; /* Nằm trên tất cả mọi thứ khác */
+}
+
+/* Animation đặc biệt cho hạt nhân: Nổ to, sáng chói, và rung màn hình */
+@keyframes nuclearShow {
+    0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
+    
+    /* Khoảnh khắc nổ: Scale cực đại, sáng rực */
+    10% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; filter: brightness(2) drop-shadow(0 0 50px orange); }
+    
+    /* Giữ nguyên cho xem mushroom cloud */
+    70% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; filter: brightness(1.1); }
+    
+    /* Mờ dần tan biến */
+    100% { transform: translate(-50%, -100%) scale(1); opacity: 0; }
+}
+
+/* RUNG MÀN HÌNH CHƠI KHI HẠT NHÂN NỔ */
+.nuclear-screen-shake {
+    animation: screenShake 0.5s ease-in-out;
+}
+@keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-5px, 5px); }
+    50% { transform: translate(5px, -5px); }
+    75% { transform: translate(-5px, -5px); }
+}
+
+/* 2. MEME SLAP THỨ HAI */
+.slap2-meme {
+    /* Set kích thước tùy theo file GIF thứ hai của bạn */
+    width: 250px; 
+    height: 180px; 
+    
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Chạy trong 2 giây rồi biến mất */
+    animation: showGifEffect 4s forwards; 
+    
+    /* Tùy chỉnh vị trí nếu meme bị lệch */
+    /* margin-left: 10px; */ 
+}
+
+/* =========================================
+   HIỆU ỨNG LẬT BÀI (DÃN RỘNG) VÀ THỐI HEO
+   ========================================= */
+
+/* 1. Khi lật bài, làm bộ bài nổi lên trên cùng để dễ nhìn */
+.opp-cards-fan.revealed {
+    z-index: 1000;
+}
+
+/* 2. Dãn khoảng cách các lá bài và phóng to lên 20% */
+.opp-cards-fan.revealed .opp-card-back-wrapper {
+    margin-left: -20px !important; /* Dãn bài ra (có thể chỉnh số này từ -15px đến -25px tuỳ ý) */
+    transform: scale(1.2); /* Phóng to bài lên để mọi người soi */
+    transform-origin: bottom center; /* Giữ chân lá bài cố định khi phóng to */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Lá đầu tiên không bị thụt lùi */
+.opp-cards-fan.revealed .opp-card-back-wrapper:first-child {
+    margin-left: 0 !important;
+}
+
+/* 3. Lá Heo sẽ nhô cao hẳn lên và phát sáng viền đỏ */
+.opp-cards-fan.revealed .thoi-heo-highlight {
+    transform: scale(1.3) translateY(-25px) !important; /* Phóng to hơn và trôi lên top 25px */
+    box-shadow: 0 5px 20px rgba(255, 0, 0, 0.7);
+    border-radius: 4px;
+}
+
+/* 4. Nhãn "THỐI HEO" bay lơ lửng trên đỉnh lá bài (không đè vào ảnh) */
+.thoi-heo-label {
+    position: absolute;
+    top: -30px; /* Đẩy hẳn lên trên nóc lá bài */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ff0000;
+    font-size: 13px;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 3px 10px;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4);
+    pointer-events: none; /* Tránh click nhầm */
+    animation: thoiHeoBounce 0.4s infinite alternate; /* Nhấp nhô gây chú ý */
+}
+
+/* Animation nhấp nhô cho cái nhãn */
+@keyframes thoiHeoBounce {
+    0% { transform: translateX(-50%) translateY(0); }
+    100% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* =========================================
+   SỬA LỖI MENU TROLL BỊ CHE KHUẤT TRÊN MOBILE
+   ========================================= */
+
+/* 1. Kẻ địch ngồi TRÊN CÙNG (Menu phải rớt xuống dưới, nếu không sẽ đụng nóc) */
+.opponent-wrapper.top .troll-menu {
+    top: 100% !important; /* Đẩy xuống dưới Avatar */
+    bottom: auto;
+    margin-top: 15px; 
+}
+
+/* Kẻ địch ngồi BÊN TRÁI (Ép menu bám vào lề trái, không canh giữa nữa) */
+.opponent-wrapper.left-side .troll-menu {
+    left: 0 !important;
+    transform: none !important; /* Hủy lệnh canh giữa */
+}
+
+/* Kẻ địch ngồi BÊN PHẢI (Ép menu bám vào lề phải) */
+.opponent-wrapper.right-side .troll-menu {
+    left: auto !important;
+    right: 0 !important;
+    transform: none !important;
+}
+
+/* Ép menu trên điện thoại phải nhỏ lại một chút để không chiếm hết chỗ */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .troll-menu {
+        padding: 5px !important;
+        gap: 5px !important;
+    }
+    .troll-menu span {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 24px !important;
+    }
+}
+@keyframes pulse-disconnect {
+    0% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
