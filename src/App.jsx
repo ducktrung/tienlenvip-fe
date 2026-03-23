@@ -258,15 +258,31 @@ function App() {
   const rtcConfig = { 
       iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' },
-          { urls: 'stun:stun3.l.google.com:19302' },
-          { urls: 'stun:global.stun.twilio.com:3478' },
-          { 
-            urls: 'turn:global.turn.twilio.com:3478?transport=udp', // Link TURN của sếp
-            username: 'TÊN_ĐĂNG_NHẬP_TURN',
-            credential: 'MẬT_KHẨU_TURN'
-        } // Bổ sung trạm Twilio cực mạnh
+        { urls: 'stun:stun1.l.google.com:19302' },
+        // NÉM THÔNG TIN TURN SERVER SẾP VỪA ĐĂNG KÝ VÀO ĐÂY:
+        {
+        urls: "stun:stun.relay.metered.ca:80",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "228a609608aaf6d0be670622",
+        credential: "biKs3cwrlrfAWk7z",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "228a609608aaf6d0be670622",
+        credential: "biKs3cwrlrfAWk7z",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "228a609608aaf6d0be670622",
+        credential: "biKs3cwrlrfAWk7z",
+      },
+      {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "228a609608aaf6d0be670622",
+        credential: "biKs3cwrlrfAWk7z",
+      },
       ] 
   };
   const [trolls, setTrolls] = useState([]);
