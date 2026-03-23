@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AuthLobby.css';
 import io from 'socket.io-client';
-
-// ĐỔI CỔNG VỀ 5000 CHO KHỚP VỚI BACKEND HOẶC 5002 TÙY BẠN
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+// ĐỔI CỔNG VỀ 5000 CHO KHỚP VỚI BACKEND HOẶC 5002 TÙY BẠN
 const socket = io(BACKEND_URL);
 
 // 🟢 NHẬN CÁC STATE ÂM THANH TỪ APP.JSX TRUYỀN XUỐNG
@@ -59,7 +58,7 @@ const AuthLobby = ({ onJoinGame, bgmVolume, setBgmVolume, sfxVolume, setSfxVolum
 
     const handleExecuteGift = async () => {
         try {
-            const response = await fetch('/api/transfer-money', {
+            const response = await fetch(`${BACKEND_URL}/api/transfer-money`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -100,7 +99,7 @@ const AuthLobby = ({ onJoinGame, bgmVolume, setBgmVolume, sfxVolume, setSfxVolum
             const parsedUser = JSON.parse(savedSession);
             setUser(parsedUser); 
 
-            fetch(`/api/user/${parsedUser.username}`)
+            fetch(`${BACKEND_URL}/api/user/${parsedUser.username}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -170,7 +169,7 @@ const AuthLobby = ({ onJoinGame, bgmVolume, setBgmVolume, sfxVolume, setSfxVolum
 
         const endpoint = isRegistering ? '/api/register' : '/api/login';
         try {
-            const response = await fetch(`${endpoint}`, {
+            const response = await fetch(`${BACKEND_URL}${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -202,7 +201,7 @@ const AuthLobby = ({ onJoinGame, bgmVolume, setBgmVolume, sfxVolume, setSfxVolum
 
     const handleShowLeaderboard = async () => {
         try {
-            const response = await fetch('/api/leaderboard');
+            const response = await fetch(`${BACKEND_URL}/api/leaderboard`);
             const data = await response.json();
             if (data.success) {
                 setLeaderboardData(data.leaderboard);
@@ -284,7 +283,7 @@ const AuthLobby = ({ onJoinGame, bgmVolume, setBgmVolume, sfxVolume, setSfxVolum
         setIsSavingProfile(true); 
 
         try {
-            const response = await fetch('/api/update-profile', {
+            const response = await fetch(`${BACKEND_URL}/api/update-profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
