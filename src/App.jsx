@@ -295,6 +295,10 @@ function App() {
   const [isMicOn, setIsMicOn] = useState(false); 
   const [winMessage, setWinMessage] = useState(null);
   const [playerMoney, setPlayerMoney] = useState({ bottom: 500000, left: 1200000, top: 800000, right: 2500000 });
+  const playerMoneyRef = useRef(playerMoney);
+  useEffect(() => {
+      playerMoneyRef.current = playerMoney;
+  }, [playerMoney]);
   
   const [toastMessage, setToastMessage] = useState(null);
   const [topAlert, setTopAlert] = useState(null);
@@ -409,7 +413,7 @@ function App() {
       if (multiplier === 0) multiplier = 6; 
 
       let theoreticalChopMoney = multiplier * baseBet;
-      const victimBalance = playerMoney[victim]; 
+      const victimBalance = playerMoneyRef.current[victim];
       let actualChopMoney = theoreticalChopMoney;
       if (victimBalance < theoreticalChopMoney) {
           actualChopMoney = victimBalance;
@@ -419,7 +423,7 @@ function App() {
           const newMoney = {
               ...prev,
               [attacker]: prev[attacker] + actualChopMoney,
-              [victim]: prev[victim] - actualChopMoney
+              [victim]: Math.max(0, prev[victim] - actualChopMoney)
           };
           if (victim === 'bottom' || attacker === 'bottom') {
               const myNewMoney = newMoney.bottom;
@@ -485,7 +489,7 @@ function App() {
 
               if (isDutMu) penaltyMoney *= 2; 
 
-              const currentBalance = playerMoney[p.key];
+              const currentBalance = playerMoneyRef.current[p.key];
               let actualPenalty = penaltyMoney;
               if (currentBalance < penaltyMoney) actualPenalty = currentBalance; 
 
@@ -508,13 +512,16 @@ function App() {
       setTimeout(() => {
           setPlayerMoney(prev => {
               const myMoneyChange = changes.bottom || 0; 
-              const myNewMoney = prev.bottom + myMoneyChange; 
+              let myNewMoney = prev.bottom + myMoneyChange; 
+              
+              // 🟢 CHỐNG ÂM TIỀN - FIX LỖI SERVER HOÀN LẠI TIỀN CŨ
+              if (myNewMoney < 0) myNewMoney = 0; 
 
               const newMoney = {
                   bottom: myNewMoney,
-                  left: prev.left + (changes.left || 0),
-                  top: prev.top + (changes.top || 0),
-                  right: prev.right + (changes.right || 0)
+                  left: Math.max(0, prev.left + (changes.left || 0)),
+                  top: Math.max(0, prev.top + (changes.top || 0)),
+                  right: Math.max(0, prev.right + (changes.right || 0))
               };
 
               if (myMoneyChange !== 0) {
@@ -1243,9 +1250,15 @@ useEffect(() => {
       let penaltyPaid = 0; 
       if (isPenalized) {
           const theoreticalPenalty = 26 * baseBet; 
-          const currentMoney = playerMoney.bottom;
+          
+          // 1. Đổi sang dùng playerMoneyRef để lấy đúng số dư thật tế
+          const currentMoney = playerMoneyRef.current.bottom;
+          
           penaltyPaid = currentMoney < theoreticalPenalty ? currentMoney : theoreticalPenalty;
-          const myNewMoney = currentMoney - penaltyPaid;
+          
+          // 2. Chuyển const thành let và ép chốt chặn không cho rớt xuống số âm
+          let myNewMoney = currentMoney - penaltyPaid;
+          if (myNewMoney < 0) myNewMoney = 0;
           try {
               await fetch(`${BACKEND_URL}/api/update-money`, {
                   method: 'POST',
